@@ -5,78 +5,109 @@ using System.Security.Cryptography;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.IO;
 
 public class TileMapScript : MonoBehaviour
 {
+    //https://learn.microsoft.com/en-us/dotnet/standard/base-types/stringbuilder
+
     public Tilemap tilemap;
     public TileBase playerTile;
     public TileBase wallTile;
     public TileBase doorTile;
     public TileBase chestTile;
 
-    string mapOutput;
-    
+    char playerChar = 'X';
+    char wallChar = '#';
+    char doorChar = 'O';
+    char chestChar = '$';
 
-    
+    string mapOutput;
+
+    //string pathToMapFile = $"{Application.dataPath}/textFile/textFileMap.txt";
+
+    bool isMapPremade = false;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
-        GenerateMapString(15,10);
-        //ConvertMapToTileMap(mapData);
+        //LoadPremadeMap(File.ReadAllLines(pathToMapFile);
+        string mapData = GenerateMapString(15, 10);
+
+        Debug.Log($"{mapData}");
+
+        ConvertMapToTileMap(mapData);
         
     }
 
     // Returns a string of a generated map
     public string GenerateMapString(int width, int height)
     {
-        mapOutput = ($"###############{Environment.NewLine}#XXXXOXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}" +
+        char[,] mapOutput = new char[width,height];
+        for (int x = 0; x < mapOutput.GetLength(0); x++)
+        {
+            for (int y = 0; y < mapOutput.GetLength(1); y++)
+            {
+                if (x == 0 && y == height - 1 || x == width - 1 && y == 0)
+                {
+                    mapOutput[x, y] = wallChar;
+                }
+            }
+        }
+
+        return mapOutput.ToString();
+        
+        /* mapOutput = ($"###############{Environment.NewLine}#XXXXOXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}" +
             $"#XXXXXX$XXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXOXX#{Environment.NewLine}#XXXXXXXX$XXXX#{Environment.NewLine}" +
             $"#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}###############");
-        return mapOutput;
+        return mapOutput; */
     }
 
     // Converts the map string into a unity tilemap
     void ConvertMapToTileMap(string mapData)
     {
-        mapOutput = mapData;
-        for (int x = 0; x < 15; x++)
+        
+        /*for (int x = 0; x < char.Parse(mapData); x++)
         {
-            for (int y = 0; y < 10; y++)
+            for (int y = 0; y < char.Parse(mapData); y++)
             {
-                if (mapOutput == "#")
+                Debug.Log($"MapData is {char.Parse(mapData)}");
+
+                if (mapData == "#")
                 {
-                    tilemap.SetTile(new Vector3Int(), wallTile);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
                 }
 
                 if (mapData == "X")
                 {
-                    tilemap.SetTile(new Vector3Int(), playerTile);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), playerTile);
                 }
 
                 if (mapData == "$")
                 {
-                    tilemap.SetTile(new Vector3Int(), chestTile);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), chestTile);
                 }
 
                 if (mapData == "O")
                 {
-                    tilemap.SetTile(new Vector3Int(), doorTile);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), doorTile);
                 }   
             }
             //return mapData;
         }
 
-        /*if (x == 0)
+        if (x == 0)
         {
             tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
         }
         */
     }
 
-    // Loads a pre-made map from a text assetq
+    // Loads a pre-made map from a text assets
     void LoadPremadeMap(string mapFilePath)
-    {
-
+    {    
     }
 
 
