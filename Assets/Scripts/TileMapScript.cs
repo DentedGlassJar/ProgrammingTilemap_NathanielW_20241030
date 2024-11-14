@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.IO;
+using UnityEditor.U2D.Aseprite;
 
 public class TileMapScript : MonoBehaviour
 {
@@ -36,8 +37,6 @@ public class TileMapScript : MonoBehaviour
         //LoadPremadeMap(File.ReadAllLines(pathToMapFile);
         string mapData = GenerateMapString(15, 10);
 
-        Debug.Log($"{mapData}");
-
         ConvertMapToTileMap(mapData);
         
     }
@@ -54,11 +53,16 @@ public class TileMapScript : MonoBehaviour
                 {
                     mapOutput[x, y] = wallChar;
                 }
+                else
+                {
+                    mapOutput[x, y] = ' ';
+                }
             }
         }
-
+        Debug.Log($"{mapOutput}");
         return mapOutput.ToString();
-        
+
+
         /* mapOutput = ($"###############{Environment.NewLine}#XXXXOXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}" +
             $"#XXXXXX$XXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXOXX#{Environment.NewLine}#XXXXXXXX$XXXX#{Environment.NewLine}" +
             $"#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}###############");
