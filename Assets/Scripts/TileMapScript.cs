@@ -1,112 +1,164 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.IO;
-using UnityEditor.U2D.Aseprite;
 
 public class TileMapScript : MonoBehaviour
-{
-    //https://learn.microsoft.com/en-us/dotnet/standard/base-types/stringbuilder
-
+{       
+    // The sprites used for the mapTiles
     public Tilemap tilemap;
     public TileBase playerTile;
     public TileBase wallTile;
     public TileBase doorTile;
     public TileBase chestTile;
 
-    char playerChar = 'X';
-    char wallChar = '#';
-    char doorChar = 'O';
-    char chestChar = '$';
+    // The size for the map
+    int width = 15;
+    int height = 10;
 
-    string mapOutput;
+    // Bool for is that specific tile is walkable or not.
+    bool isTileWalkable;
+
+    // The characters used that represents different mapTiles
+    string wallStr = "#";
+    string doorStr = "O";
+    string chestStr = "$";
+    string playerStr = "X";
+
+    public string[,] mapOutput;
 
     //string pathToMapFile = $"{Application.dataPath}/textFile/textFileMap.txt";
 
     bool isMapPremade = false;
 
 
-
     // Start is called before the first frame update
     void Start()
     {
         //LoadPremadeMap(File.ReadAllLines(pathToMapFile);
-        string mapData = GenerateMapString(15, 10);
+        GenerateMapString();
 
-        ConvertMapToTileMap(mapData);
+        ConvertMapToTileMap();
         
+    }
+
+    private void Update()
+    {
+        PlayerMovement();
     }
 
     // Returns a string of a generated map
-    public string GenerateMapString(int width, int height)
+    public void GenerateMapString()
     {
-        char[,] mapOutput = new char[width,height];
-        for (int x = 0; x < mapOutput.GetLength(0); x++)
+
+        string[,] mapString = new string[width,height];
+        mapOutput = new string[width,height];
+        for(int x = 0; x < width; x++)
         {
-            for (int y = 0; y < mapOutput.GetLength(1); y++)
+            for(int y = 0; y < height; y++)
             {
-                if (x == 0 && y == height - 1 || x == width - 1 && y == 0)
+                mapOutput[7, 4] = playerStr;
+
+                if (x == 0 || y == 0 || x == 14 || y == 9)
                 {
-                    mapOutput[x, y] = wallChar;
+                    mapString[x, y] = wallStr;
+                    mapOutput[x, y] += mapString[x, y];
                 }
-                else
+                else if (x > 0 || y > 0 || x < 14 || y < 9)
                 {
-                    mapOutput[x, y] = ' ';
+                    if(x == 1 && y == 1)
+                    {
+                        if(Random.Range(0,2) == 0)
+                        {
+                            mapString[x, y] = chestStr;
+                            mapOutput[x, y] += mapString[x, y];
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    if(x == 1 && y == 8)
+                    {
+                        if (Random.Range(0, 2) == 0)
+                        {
+                            mapString[x, y] = chestStr;
+                            mapOutput[x, y] += mapString[x, y];
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    if(x == 13 && y == 1)
+                    {
+                        if (Random.Range(0, 2) == 0)
+                        {
+                            mapString[x, y] = chestStr;
+                            mapOutput[x, y] += mapString[x, y];
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (x == 13 && y == 8)
+                    {
+                        if (Random.Range(0, 2) == 0)
+                        {
+                            mapString[x, y] = chestStr;
+                            mapOutput[x, y] += mapString[x, y];
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
                 }
+                /* I want there to be a max. of 2 chests in the corners of the map.
+                 * I want to check and see if there is 5 wall tiles around the tile that the chest will spawn in
+                 * If there is, I want to check if there is already 2 chests in the map, if there isn't, I want there to be a random spawn chance between 1/2 for a chest to spawn.
+                 * If there's already two chests, I want the loop to break.
+                */
+
             }
-        }
-        Debug.Log($"{mapOutput}");
-        return mapOutput.ToString();
-
-
-        /* mapOutput = ($"###############{Environment.NewLine}#XXXXOXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}" +
-            $"#XXXXXX$XXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXOXX#{Environment.NewLine}#XXXXXXXX$XXXX#{Environment.NewLine}" +
-            $"#XXXXXXXXXXXXX#{Environment.NewLine}#XXXXXXXXXXXXX#{Environment.NewLine}###############");
-        return mapOutput; */
+        } 
     }
 
     // Converts the map string into a unity tilemap
-    void ConvertMapToTileMap(string mapData)
+    void ConvertMapToTileMap()
     {
-        
-        /*for (int x = 0; x < char.Parse(mapData); x++)
+        for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < char.Parse(mapData); y++)
+            for (int y = 0; y < height; y++)
             {
-                Debug.Log($"MapData is {char.Parse(mapData)}");
 
-                if (mapData == "#")
+                if (mapOutput[x, y] == wallStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
+                    isTileWalkable = false;
                 }
 
-                if (mapData == "X")
+                if (mapOutput[x, y]  == playerStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), playerTile);
+                    isTileWalkable = true;
                 }
 
-                if (mapData == "$")
+                if (mapOutput[x, y] == chestStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), chestTile);
+                    isTileWalkable = false;
                 }
 
-                if (mapData == "O")
+                if (mapOutput[x, y] == doorStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), doorTile);
-                }   
+                    isTileWalkable = true;
+                }
             }
-            //return mapData;
         }
-
-        if (x == 0)
-        {
-            tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
-        }
-        */
     }
 
     // Loads a pre-made map from a text assets
@@ -114,41 +166,12 @@ public class TileMapScript : MonoBehaviour
     {    
     }
 
-
+    void PlayerMovement()
+    {
+    }
 }
 
 
 
 // ---------------------------------------------------------------------------------------------------
-
-/* void DrawTilemap()
-{
-    for (int y = 0; y < mapArea.GetLength(1); y++)
-    {
-        for (int x = 0; x < mapArea.GetLength(0); x++)
-        {
-            if (mapArea[x, y] == 0)
-            {
-                tilemap.SetTile(new Vector3Int(x, y, 0), null);
-            }
-            else
-            {
-                tilemap.SetTile(new Vector3Int(x, y, 0), groundTile);
-            }
-        }
-    }
-}
-
-    void Start()
-    {
-        for (int y = 0; y < mapArea.GetLength(1); y++)
-        {
-            for (int x = 0; x < mapArea.GetLength(0); x++)
-            {
-                mapArea[x,y] = Random.Range(0, 2);   
-            }
-        }
-        DrawTilemap();
-    }
-*/
 
