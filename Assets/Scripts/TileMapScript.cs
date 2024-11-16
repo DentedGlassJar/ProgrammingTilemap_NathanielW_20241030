@@ -27,12 +27,26 @@ public class TileMapScript : MonoBehaviour
 
     //string pathToMapFile = $"{Application.dataPath}/textFile/textFileMap.txt";
 
+    // A bool that turns true if a chest has been created in a map
+    bool isChestCreated;
+
+    // A int that increases by one for every created door
+    int numOfDoors;
+
+    // A bool that returns true if two doors have been created
+    bool isDoorsCreated;
+
     bool isMapPremade = false;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        isChestCreated = false;
+
+        numOfDoors = 0;
+        isDoorsCreated = false;
+
         //LoadPremadeMap(File.ReadAllLines(pathToMapFile);
         GenerateMapString();
 
@@ -53,36 +67,27 @@ public class TileMapScript : MonoBehaviour
         mapOutput = new string[width,height];
         for(int x = 0; x < width; x++)
         {
-            for(int y = 0; y < height; y++)
+            for (int y = 0; y < height; y++)
             {
                 mapOutput[7, 4] = playerStr;
 
+                // Generational Rule for the walls
                 if (x == 0 || y == 0 || x == 14 || y == 9)
                 {
                     mapString[x, y] = wallStr;
                     mapOutput[x, y] += mapString[x, y];
                 }
-                else if (x > 0 || y > 0 || x < 14 || y < 9)
+
+                // Procedural Generation Rule for the chests
+                else if (x == 1 || y == 1 || x == 13 || y == 8)
                 {
-                    if(x == 1 && y == 1)
+                    if (x == 1 && y == 1)
                     {
-                        if(Random.Range(0,2) == 0)
+                        if (Random.Range(0, 3) == 0)
                         {
                             mapString[x, y] = chestStr;
                             mapOutput[x, y] += mapString[x, y];
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    
-                    if(x == 1 && y == 8)
-                    {
-                        if (Random.Range(0, 2) == 0)
-                        {
-                            mapString[x, y] = chestStr;
-                            mapOutput[x, y] += mapString[x, y];
+                            isChestCreated = true;
                         }
                         else
                         {
@@ -90,12 +95,21 @@ public class TileMapScript : MonoBehaviour
                         }
                     }
 
-                    if(x == 13 && y == 1)
+                    else if (x == 1 && y == 8)
                     {
-                        if (Random.Range(0, 2) == 0)
+                        if (Random.Range(0, 3) == 0)
                         {
-                            mapString[x, y] = chestStr;
-                            mapOutput[x, y] += mapString[x, y];
+                            if (isChestCreated == false)
+                            {
+                                mapString[x, y] = chestStr;
+                                mapOutput[x, y] += mapString[x, y];
+                                isChestCreated = true;
+                            }
+                            else
+                            {
+                                mapString[x, y] = null;
+                                mapOutput[x, y] += mapString[x, y];
+                            }
                         }
                         else
                         {
@@ -103,25 +117,68 @@ public class TileMapScript : MonoBehaviour
                         }
                     }
 
-                    if (x == 13 && y == 8)
+                    else if (x == 13 && y == 1)
                     {
-                        if (Random.Range(0, 2) == 0)
+                        if (Random.Range(0, 3) == 0)
                         {
-                            mapString[x, y] = chestStr;
-                            mapOutput[x, y] += mapString[x, y];
+                            if (isChestCreated == false)
+                            {
+                                mapString[x, y] = chestStr;
+                                mapOutput[x, y] += mapString[x, y];
+                                isChestCreated = true;
+                            }
+                            else
+                            {
+                                mapString[x, y] = null;
+                                mapOutput[x, y] += mapString[x, y];
+                            }
                         }
                         else
                         {
                             continue;
                         }
+                    }
+
+                    else if (x == 13 && y == 8)
+                    {
+                        if (isChestCreated == false)
+                        {
+                            mapString[x, y] = chestStr;
+                            mapOutput[x, y] += mapString[x, y];
+                            isChestCreated = true;
+                            continue;
+                        }
+                    }
+
+                    // Procedural Generation Rule for the doors
+                    if (Random.Range(0, 6) == 0)
+                    {
+                        if (numOfDoors == 2)
+                        {
+                            isDoorsCreated = true;
+                        }
+
+                        if (isDoorsCreated == true)
+                        {
+                            continue;
+                        }
+
+                        if (mapOutput[x, y] == chestStr)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            mapString[x, y] = doorStr;
+                            mapOutput[x, y] += mapString[x, y];
+                            numOfDoors++;
+                        }
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
-                /* I want there to be a max. of 2 chests in the corners of the map.
-                 * I want to check and see if there is 5 wall tiles around the tile that the chest will spawn in
-                 * If there is, I want to check if there is already 2 chests in the map, if there isn't, I want there to be a random spawn chance between 1/2 for a chest to spawn.
-                 * If there's already two chests, I want the loop to break.
-                */
-
             }
         } 
     }
