@@ -49,6 +49,21 @@ public class TileMapScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if(tilemap == wallTile)
+        {
+            isTileWalkable = false;
+        }
+
+        if(tilemap == chestTile)
+        {
+            isTileWalkable = false;
+        }
+
+        if (tilemap == doorTile)
+        {
+            isTileWalkable = false;
+        }
+
         playerPosition = new Vector3Int(7, 4, 0);
         isChestCreated = false;
 
@@ -73,30 +88,63 @@ public class TileMapScript : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            tilemap.SetTile(playerPosition, null);
-            newPlayerPosition = playerPosition + Vector3Int.left;
-            playerPosition = newPlayerPosition;
+            if(isTileWalkable == false)
+            {
+                tilemap.SetTile(playerPosition, null);
+                newPlayerPosition = playerPosition + Vector3Int.left;
+                playerPosition = newPlayerPosition;
+            }
+            else
+            {
+                newPlayerPosition = playerPosition;
+                playerPosition = newPlayerPosition;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            tilemap.SetTile(playerPosition, null);
-            newPlayerPosition = playerPosition + Vector3Int.up;
-            playerPosition = newPlayerPosition;
+            if (isTileWalkable == false)
+            {
+                tilemap.SetTile(playerPosition, null);
+                newPlayerPosition = playerPosition + Vector3Int.up;
+                playerPosition = newPlayerPosition;
+            }
+            else
+            {
+                newPlayerPosition = playerPosition;
+                playerPosition = newPlayerPosition;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            tilemap.SetTile(playerPosition, null);
-            newPlayerPosition = playerPosition + Vector3Int.right;
-            playerPosition = newPlayerPosition;
+            if (isTileWalkable == false)
+            {
+                tilemap.SetTile(playerPosition, null);
+                newPlayerPosition = playerPosition + Vector3Int.right;
+                playerPosition = newPlayerPosition;
+            }
+            else
+            {
+                newPlayerPosition = playerPosition;
+                playerPosition = newPlayerPosition;
+            }
+
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            tilemap.SetTile(playerPosition, null);
-            newPlayerPosition = playerPosition + Vector3Int.down;
-            playerPosition = newPlayerPosition;
+            if (isTileWalkable == false)
+            {
+                tilemap.SetTile(playerPosition, null);
+                newPlayerPosition = playerPosition + Vector3Int.down;
+                playerPosition = newPlayerPosition;
+            }
+            else
+            {
+                newPlayerPosition = playerPosition;
+                playerPosition = newPlayerPosition;
+            }
         }
     }
 
@@ -235,19 +283,16 @@ public class TileMapScript : MonoBehaviour
                 if (mapOutput[x, y] == wallStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
-                    isTileWalkable = false;
                 }
 
                 if (mapOutput[x, y] == chestStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), chestTile);
-                    isTileWalkable = false;
                 }
 
                 if (mapOutput[x, y] == doorStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), doorTile);
-                    isTileWalkable = true;
                 }
             }
         }
