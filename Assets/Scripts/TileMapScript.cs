@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using Unity.Collections;
+using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class TileMapScript : MonoBehaviour
-{       
+{
+    //string pathToMapFile = $"{Application.dataPath}/textFile/textFileMap.txt";
+
     // The sprites used for the mapTiles
     public Tilemap tilemap;
     public TileBase playerTile;
@@ -21,11 +24,9 @@ public class TileMapScript : MonoBehaviour
     string wallStr = "#";
     string doorStr = "O";
     string chestStr = "$";
-    string playerStr = "X";
 
+    // A multidimensional string array that outputs the strings of the map
     public string[,] mapOutput;
-
-    //string pathToMapFile = $"{Application.dataPath}/textFile/textFileMap.txt";
 
     // A bool that turns true if a chest has been created in a map
     bool isChestCreated;
@@ -36,12 +37,19 @@ public class TileMapScript : MonoBehaviour
     // A bool that returns true if two doors have been created
     bool isDoorsCreated;
 
+    // A bool that returns true if a valid map has been created
     bool isMapPremade = false;
 
+    // A vector3int that is the position of the player
+    Vector3Int playerPosition;
+
+    // A vector3int that is the new position of that player whenever they move
+    Vector3Int newPlayerPosition;
 
     // Start is called before the first frame update
     void Start()
     {
+        playerPosition = new Vector3Int(7, 4, 0);
         isChestCreated = false;
 
         numOfDoors = 0;
@@ -59,17 +67,49 @@ public class TileMapScript : MonoBehaviour
         PlayerMovement();
     }
 
+    private void PlayerMovement()
+    {
+        tilemap.SetTile(playerPosition, playerTile);
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            tilemap.SetTile(playerPosition, null);
+            newPlayerPosition = playerPosition + Vector3Int.left;
+            playerPosition = newPlayerPosition;
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            tilemap.SetTile(playerPosition, null);
+            newPlayerPosition = playerPosition + Vector3Int.up;
+            playerPosition = newPlayerPosition;
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            tilemap.SetTile(playerPosition, null);
+            newPlayerPosition = playerPosition + Vector3Int.right;
+            playerPosition = newPlayerPosition;
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            tilemap.SetTile(playerPosition, null);
+            newPlayerPosition = playerPosition + Vector3Int.down;
+            playerPosition = newPlayerPosition;
+        }
+    }
+
     // Returns a string of a generated map
     public void GenerateMapString()
     {
-
         string[,] mapString = new string[width,height];
         mapOutput = new string[width,height];
-        for(int x = 0; x < width; x++)
+
+        for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                mapOutput[7, 4] = playerStr;
 
                 // Generational Rule for the walls
                 if (x == 0 || y == 0 || x == 14 || y == 9)
@@ -97,6 +137,7 @@ public class TileMapScript : MonoBehaviour
 
                     else if (x == 1 && y == 8)
                     {
+                        // Generates a random int between 1 and 2, and continues the loop if it's zero
                         if (Random.Range(0, 3) == 0)
                         {
                             if (isChestCreated == false)
@@ -119,6 +160,7 @@ public class TileMapScript : MonoBehaviour
 
                     else if (x == 13 && y == 1)
                     {
+                        // Generates a random int between 1 and 2, and continues the loop if it's zero
                         if (Random.Range(0, 3) == 0)
                         {
                             if (isChestCreated == false)
@@ -190,17 +232,10 @@ public class TileMapScript : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-
                 if (mapOutput[x, y] == wallStr)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
                     isTileWalkable = false;
-                }
-
-                if (mapOutput[x, y]  == playerStr)
-                {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), playerTile);
-                    isTileWalkable = true;
                 }
 
                 if (mapOutput[x, y] == chestStr)
@@ -222,13 +257,5 @@ public class TileMapScript : MonoBehaviour
     void LoadPremadeMap(string mapFilePath)
     {    
     }
-
-    void PlayerMovement()
-    {
-    }
 }
-
-
-
-// ---------------------------------------------------------------------------------------------------
 
